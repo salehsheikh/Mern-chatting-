@@ -7,24 +7,123 @@ import {
   InputRightElement,
   VStack,
 } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
+import axios from "axios";
 import React, { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const SignUp = () => {
+  const navigate=useNavigate();
   const [name, setName] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [confirmpassword, setConfirmpassword] = useState();
   const [pic, setPic] = useState();
   const [show, setShow] = useState(false);
-  const handleClick=()=>{
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+  const handleClick = () => {
     setShow(!show);
   };
-  const postDetails=(pics)=>{
-
+  const postDetails = (pics) => {
+    setLoading(true);
+    if (pics === undefined) {
+      toast({
+        title: "Please  select an image.",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+    if (pics.type === "image/jpeg" || pics.type === "image/png") {
+      const data = new FormData();
+      data.append("file", pics);
+      data.append("upload_preset", "chat-app");
+      data.append("cloud_name", "de2zfvfdq");
+      fetch(import.meta.env.VITE_CLOUDINARY, {
+        method: "post",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data.url.toString());
+          setPic(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
+    } else {
+      toast({
+        title: "Please  select an image.",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+      return;
+    }
   };
-  const submitHandler=()=>{
-
+    const submitHandler =async () => {
+      setLoading(true);
+      if(!email || !name  || !password || !confirmpassword){
+        toast({
+          title: "please fill all the required fields",
+          status: "warning",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+        setLoading(false)
+        return;
+      };
+     
+   
+    if(password!==confirmpassword){
+      toast({
+        title: "password doesnt match",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+    try {
+      const config={
+       headers:{
+        "Content-type":"application/json",
+       },
+      };
+      const{data}= await axios.post("http://localhost:5000/api/user",
+      {name,email,password,pic},
+      config);
+      toast({
+        title: "regesterartion is succesfull",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      localStorage.setItem("UserInfo",JSON.stringify(data));
+      console.log(data);
+      navigate("/chats")
+    } catch (error) {
+      toast({
+        title: "error warning",
+        description: error.response.data.message,
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      
+    }
   }
+  
   return (
     <VStack spacing="5px" color="black">
       <FormControl id="first-name" isRequired>
@@ -47,7 +146,7 @@ const SignUp = () => {
         <FormLabel>password</FormLabel>
         <InputGroup>
           <Input
-          type={show ? "text" : "password"}
+            type={show ? "text" : "password"}
             placeholder="enter your password"
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -63,7 +162,7 @@ const SignUp = () => {
         <FormLabel> confirm password</FormLabel>
         <InputGroup>
           <Input
-          type={show ? "text" : "password"}
+            type={show ? "text" : "password"}
             placeholder="confirm password"
             onChange={(e) => setConfirmpassword(e.target.value)}
           />
@@ -76,12 +175,22 @@ const SignUp = () => {
       </FormControl>
 
       <FormControl>
-        <Input type="file" p={1.5} accept="image/" onChange={(e)=>postDetails(e.target.files[0])}/>
+        <Input
+          type="file"
+          p={1.5}
+          accept="image/"
+          onChange={(e) => postDetails(e.target.files[0])}
+        />
       </FormControl>
-      <Button colorScheme="blue"
-      width="100%"
-      style={{marginTop:15}}
-      onClick={submitHandler}>submit</Button>
+      <Button
+        colorScheme="blue"
+        width="100%"
+        style={{ marginTop: 15 }}
+        onClick={submitHandler}
+        isLoading={loading}
+      >
+        SignUp
+      </Button>
     </VStack>
   );
 };
