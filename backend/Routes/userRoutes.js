@@ -1,6 +1,7 @@
-const express=require('express');
-const{registerUser, authUser}=require('../controllers/userControllers')
-const router=express.Router()
-router.route('/').post(registerUser);
+import express from 'express';
+import{registerUser, authUser,allUsers} from'../controllers/userControllers.js'
+import { protect } from '../middleware/authMiddleware.js';
+const router=express.Router();
+router.route('/').post(registerUser).get(protect,allUsers);
 router.post('/login',authUser);
-module.exports=router;
+export default router;
