@@ -1,28 +1,28 @@
 import jwt from 'jsonwebtoken';
-import User from '../models/userModel';
+import User from '../models/userModel.js';
 import asyncHandler from "express-async-handler";
 import dotenv from "dotenv";
 dotenv.config();
-const protect=asyncHandler(async(req,res,next)=>{
-let token;
-if(
-    req.headers.authorization && 
-    req.headers.authorization.startsWith("Bearer")
-){
-    try{
-        token=req.headers.authorization.split("")[1];
-        //decodes jwt token id
-        const decode=jwt.verify(token,process.env.JWT_SECRET);
-       req.user=  await User.findById(decode.id).select("-password");
-       next();
-    }catch(error){
-        res.status(401);
-        throw new Error("Not authorized, token failed");
+
+const protect = asyncHandler(async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    try {
+      // Split the authorization header by space to get the token
+      token = req.headers.authorization.split(" ")[1];
+      // Decode jwt token id
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select("-password");
+      next();
+    } catch (error) {
+      res.status(401);
+      throw new Error("Not authorized, token failed");
     }
-}
-if(!token){
+  }
+  if (!token) {
     res.status(401);
-    throw new Error("Not authorized, token failed");
-}
+    throw new Error("Not authorized, token nill");
+  }
 });
-export {protect};
+
+export { protect };

@@ -41,14 +41,13 @@ const SignUp = () => {
       data.append("file", pics);
       data.append("upload_preset", "chat-app");
       data.append("cloud_name", "de2zfvfdq");
-      fetch(import.meta.env.VITE_CLOUDINARY, {
+      fetch(import.meta.env.VITE_CLOUDINARY ||("https://api.cloudinary.com/v1_1/de2zfvfdq/image/upload") , {
         method: "post",
         body: data,
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data.url.toString());
-          setPic(data);
+          setPic(data.url.toString());
           setLoading(false);
         })
         .catch((err) => {

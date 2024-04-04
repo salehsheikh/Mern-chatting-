@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const messageModel=mongoose.Schema({
     sender:{
@@ -11,10 +11,10 @@ const messageModel=mongoose.Schema({
     },
     chat:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"chat",
+        ref:"Chat",
     },
 },
 {timestamps:true,}
 );
 const Message=mongoose.model('Message',messageModel);
-module.exports=Message;
+export default Message;

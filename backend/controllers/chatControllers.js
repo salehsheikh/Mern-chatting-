@@ -10,7 +10,7 @@ if(!userId){
 }
 
 var isChat=await Chat.find({
-    isGroupchat:false,
+    isGroupChat:false,
     $and:[
         {users:{$elemMatch:{$eq:req.user._id}}},
         {users:{$elemMatch:{$eq:userId}}},
@@ -76,7 +76,7 @@ const createGroupChat=asyncHandler(async(req,res,)=>{
         const groupChat=await Chat.create({
             chatName:req.body.name,
             users:users,
-            isGroupchat:true,
+            isGroupChat:true,
             groupAdmin:req.user,
         });
         const fullGoupChat=await Chat.findOne({_id:groupChat._id}).populate("users","-password")

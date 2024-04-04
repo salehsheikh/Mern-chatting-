@@ -3,6 +3,7 @@ import http from 'http'; // Change the import to use default export
 import { Server as SocketIO } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import path from 'path';
 import connectDB from './config/db.js';
 import userRoutes from './Routes/userRoutes.js';
 import chatRoutes from './Routes/chatRoutes.js';
@@ -20,7 +21,23 @@ app.get('/', (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
+// --------------------------deployment------------------------------
 
+const __dirname = path.resolve();
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running..");
+  });
+}
+
+// --------------------------deployment------------------------------
 app.use(notFound);
 app.use(errorHandler);
 

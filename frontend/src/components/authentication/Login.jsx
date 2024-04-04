@@ -11,6 +11,7 @@ import {
   import { useToast } from "@chakra-ui/react";
   import axios from "axios";
   import { useNavigate } from "react-router-dom";
+import { ChatState } from '../../context/ChatProvider';
 const Login = () => {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
@@ -21,6 +22,7 @@ const Login = () => {
     const handleClick=()=>{
       setShow(!show);
     };
+    const { setUser } = ChatState();
     const submitHandler =async () => {
       setLoading(true);
       if(!email|| !password){
@@ -46,11 +48,12 @@ const Login = () => {
       config);
       toast({
         title: "login succesfully",
-        status: "warning",
+        status: "success",
         duration: 5000,
         isClosable: true,
         position: "bottom",
       });
+      setUser(data);
       localStorage.setItem("UserInfo",JSON.stringify(data));
       setLoading(false)
       navigate("/chats")
@@ -72,6 +75,7 @@ const Login = () => {
         <FormLabel>email</FormLabel>
         <Input
           placeholder="enter your email"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
       </FormControl>
@@ -82,6 +86,7 @@ const Login = () => {
           <Input
           type={show ? "text" : "password"}
             placeholder="enter your password"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <InputRightElement>
