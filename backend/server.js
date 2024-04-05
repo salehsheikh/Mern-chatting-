@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, './frontend/dist')));
 
 app.use(express.static(path.join(__dirname, './frontend/dist')))
 app.get('*', function (req, res) {
-  res.sendFile(path.resolve(__dirname, './frontend/build/index.html'));
+  res.sendFile(path.resolve(__dirname, './frontend/dist/index.html'));
 });
 app.use(notFound);
 app.use(errorHandler);
