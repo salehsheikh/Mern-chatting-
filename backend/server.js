@@ -23,12 +23,21 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use(express.static(path.join(__dirname, './frontend/dist')));
 
-// static files
+// --------------------------deployment------------------------------
+const __dirname1 = path.resolve();
 
-app.use(express.static(path.join(__dirname, './frontend/dist')))
-app.get('*', function (req, res) {
-  res.sendFile(path.resolve(__dirname, './frontend/dist/index.html'));
-});
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/frontend/dist")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname1, "frontend", "dist", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running..");
+  });
+}
+// --------------------------deployment------------------------------
 app.use(notFound);
 app.use(errorHandler);
 
